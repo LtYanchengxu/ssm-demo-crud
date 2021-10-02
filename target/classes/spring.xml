@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!--跟业务逻辑有关的-->
+
+    <!--扫描组件-->
+    <context:component-scan base-package="top.yanchengxu">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!--加载jdbc配置文件-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <!--配置数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.user}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!--整合MyBatis-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+        <!--<property name="mapperLocations" value="top/yanchengxu/mapper/*.xml"/>-->
+        <property name="mapperLocations" value="classpath:top/yanchengxu/mapper/*.xml"/>
+    </bean>
+
+    <!--配置扫扫描器，将MyBatis的Mapper接口扫描至Spring容器中-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer" id="scannerConfigurer">
+        <property name="basePackage" value="top.yanchengxu.dao"/>
+    </bean>
+
+    <!--配置批量插入-->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"/>
+        <constructor-arg name="executorType" value="BATCH"/>
+    </bean>
+
+    <!--事务控制-->
+    <bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager" id="transactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--开启基于注解的事务 使用xml方式配置 重要的事务配置使用配置式-->
+    <aop:config>
+        <aop:pointcut id="txPointcut" expression="execution(* top.yanchengxu.service..*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+    </aop:config>
+    
+    <tx:advice id="txAdvice">
+        <tx:attributes>
+            <tx:method name="*"/>
+            <!--调优：以get开头的方法都是查询方法，设为只读-->
+            <tx:method name="get*" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+
+
+</beans>
