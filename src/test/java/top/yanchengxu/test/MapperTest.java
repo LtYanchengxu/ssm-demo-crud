@@ -18,11 +18,13 @@ import java.util.UUID;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MapperTest {
 
+    /*
     @Autowired
     private DepartmentMapper departmentMapper;
 
     @Autowired
     private EmployeeMapper employeeMapper;
+    */
 
     @Autowired
     private SqlSession sqlSession;

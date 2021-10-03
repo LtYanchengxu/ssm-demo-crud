@@ -537,6 +537,7 @@
             delEmpNames += $(this).parents("tr").find("td:eq(2)").text() + ","
             ids += $(this).parents("tr").find("td:eq(1)").text() + "-"
         })
+        // 去除末尾符号
         delEmpNames = delEmpNames.substring(0, delEmpNames.length - 1);
         ids = ids.substring(0, ids.length - 1);
         if (confirm("确定删除【" + delEmpNames + "】吗？")) {
@@ -550,8 +551,6 @@
                 }
             })
         }
-
-        
     })
 
     

@@ -91,7 +91,6 @@ public class EmployeeController {
     @RequestMapping("/emps")
     @ResponseBody
     public Message getAll(@RequestParam(value = "pn", defaultValue = "1") Integer pn) {
-        ModelAndView modelAndView = new ModelAndView();
         // 在查询之前调用PageHelper.startPage, 设置从哪一页开始，每页几条
         PageHelper.startPage(pn, 5);
         // startPage后紧跟的查询

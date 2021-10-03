@@ -57,6 +57,5 @@ public class Message {
     public Message add(String key, Object val) {
         this.getExtend().put(key, val);
         return this;
-
     }
 }
